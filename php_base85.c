@@ -94,7 +94,11 @@ void _copy_with_padding(char *dest, const char *src, int len, int padding_size, 
 PHP_FUNCTION(base85_encode)
 {
     char *data, *encoded;
+#if PHP_VERSION_ID < 70000
     int data_len, encoded_len;
+#else
+    size_t data_len, encoded_len;
+#endif
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) == FAILURE) {
         RETURN_NULL();
@@ -107,7 +111,11 @@ PHP_FUNCTION(base85_encode)
     
     encoded_len = encode_85(encoded, data, data_len);
     
+#if  PHP_VERSION_ID < 70000
     RETURN_STRINGL(encoded, encoded_len, 1);
+#else
+    RETURN_STRINGL(encoded, encoded_len);
+#endif
     
     efree(encoded);
 }
@@ -118,7 +126,11 @@ PHP_FUNCTION(base85_encode)
 PHP_FUNCTION(base85_decode)
 {
     char *data, *decoded;
+#if PHP_VERSION_ID < 70000
     int data_len, decoded_len;
+#else
+    size_t data_len, decoded_len;
+#endif
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) == FAILURE) {
         RETURN_NULL();
@@ -129,7 +141,11 @@ PHP_FUNCTION(base85_decode)
     decoded_len = decode_85(decoded, data, data_len);
     
     if(decoded_len != DECODING_ERROR) {
+#if PHP_VERSION_ID < 70000
         RETVAL_STRINGL(decoded, decoded_len, 1);
+#else
+        RETVAL_STRINGL(decoded, decoded_len);
+#endif
     } else {
         RETURN_NULL();
     }
